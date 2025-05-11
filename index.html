@@ -1964,47 +1964,77 @@ mobileMenu.classList.toggle('hidden');
 const menuTabs = document.querySelectorAll('.menu-tab');
 const menuSections = document.querySelectorAll('.menu-section');
 let activeTab = null;
+
 menuTabs.forEach(tab => {
-tab.addEventListener('click', function() {
-const target = this.getAttribute('data-target');
-if (activeTab === this) {
-// If clicking the active tab, show all sections
-menuSections.forEach(section => section.classList.add('active'));
-this.classList.remove('active');
-activeTab = null;
-} else {
-// Hide all sections
-menuSections.forEach(section => section.classList.remove('active'));
-// Remove active class from all tabs
-menuTabs.forEach(tab => tab.classList.remove('active'));
-// Show target section
-document.getElementById(target).classList.add('active');
-// Add active class to clicked tab
-this.classList.add('active');
-activeTab = this;
-}
-});
+  tab.addEventListener('click', function() {
+    const target = this.getAttribute('data-target');
+    
+    // Actualiza la URL con el hash del menú
+    if (history.pushState) {
+      history.pushState(null, null, '#menu');
+    } else {
+      location.hash = '#menu';
+    }
+
+    if (activeTab === this) {
+      // If clicking the active tab, show all sections
+      menuSections.forEach(section => section.classList.add('active'));
+      this.classList.remove('active');
+      activeTab = null;
+    } else {
+      // Hide all sections
+      menuSections.forEach(section => section.classList.remove('active'));
+      // Remove active class from all tabs
+      menuTabs.forEach(tab => tab.classList.remove('active'));
+      // Show target section
+      document.getElementById(target).classList.add('active');
+      // Add active class to clicked tab
+      this.classList.add('active');
+      activeTab = this;
+    }
+  });
 });
 // Smooth scroll for anchor links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-anchor.addEventListener('click', function(e) {
-e.preventDefault();
-const targetId = this.getAttribute('href');
-if (targetId === '#') return;
-const targetElement = document.querySelector(targetId);
-if (targetElement) {
-window.scrollTo({
-top: targetElement.offsetTop - 80,
-behavior: 'smooth'
+  anchor.addEventListener('click', function(e) {
+    e.preventDefault();
+    const targetId = this.getAttribute('href');
+    if (targetId === '#') return;
+    
+    // Actualiza la URL con el hash
+    if (history.pushState) {
+      history.pushState(null, null, targetId);
+    } else {
+      location.hash = targetId;
+    }
+
+    const targetElement = document.querySelector(targetId);
+    if (targetElement) {
+      window.scrollTo({
+        top: targetElement.offsetTop - 80,
+        behavior: 'smooth'
+      });
+      // Close mobile menu if open
+      if (!mobileMenu.classList.contains('hidden')) {
+        mobileMenu.classList.add('hidden');
+      }
+    }
+  });
 });
-// Close mobile menu if open
-if (!mobileMenu.classList.contains('hidden')) {
-mobileMenu.classList.add('hidden');
-}
-}
+  // Check for hash on page load
+window.addEventListener('load', function() {
+  if (window.location.hash) {
+    const targetElement = document.querySelector(window.location.hash);
+    if (targetElement) {
+      setTimeout(() => {
+        window.scrollTo({
+          top: targetElement.offsetTop - 80,
+          behavior: 'smooth'
+        });
+      }, 100);
+    }
+  }
 });
-});
-});
-</script>
+ </script>
 </body>
 </html>
